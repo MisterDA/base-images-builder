@@ -8,11 +8,11 @@ md output
 
 docker container rm builder-run >nul 2>&1
 docker run --isolation=%ISOLATION% --cpu-count=%CPU_COUNT% --memory=8g ^
-           --network="%NETWORK%" --user=ContainerAdministrator ^
+           --network=nat --user=ContainerAdministrator ^
            --name builder-run ^
            -v %CD%:C:\cygwin64\home\opam\base-images-builder ^
            --entrypoint C:\cygwin64\bin\bash.exe ^
-           -t builder --login -c "~/base-images-builder/build.sh extract"
+           builder --login -c "~/base-images-builder/build.sh extract"
 docker commit builder-run builder
 
 goto :EOF

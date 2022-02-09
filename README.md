@@ -34,47 +34,67 @@ set SECRETS=%CD%\capnp-secrets
 @rem the Docker Hub account where to push images
 set ALLOW_PUSH=ocurrent/opam-staging
 
-mkdir %SECRETS%
-
 @rem Set the Docker isolation
 set ISOLATION=hyperv
-@rem Set the Docker Network
-set NETWORK=nat
 
 @rem Build everything
-deps.cmd && build.cmd
+.\deps.cmd && .\build.cmd
 
-.\output\ocluster-scheduler.exe install ^
+mkdir %SECRETS%
+
+set SCHEDULER_NAME=ocluster-scheduler
+set WORKER_NAME=ocluster-%COMPUTER_NAME%-worker
+
+.\install\bin\ocluster-scheduler.exe install ^
+  --state-dir=%LIB%\ocluster-scheduler ^
   --capnp-secret-key-file=%SECRETS%\key.pem ^
   --capnp-listen-address=tcp:0.0.0.0:9000 ^
-  --capnp-public-address=tcp:ocl.cl.cam.ac.uk:9000 ^
-  --state-dir=%LIB%\ocluster-scheduler ^
+  --capnp-public-address=tcp:localhost:9000 ^
   --secrets-dir=%SECRETS% ^
   --pools=windows-x86_64 ^
   --verbosity=info
 
 @rem as an Administrator
-sc start ocluster-scheduler
+sc start %SCHEDULER_NAME%
 
 set /a CAPACITY=NUMBER_OF_PROCESSORS/4
 
-.\output\ocluster-worker.exe install ^
+.\install\bin\ocluster-worker.exe install ^
   --state-dir=%LIB%\ocluster-worker ^
-  --obuilder-state-dir=%LIB%\obuilder ^
-  --name=%COMPUTERNAME%-worker ^
+  --name=%WORKER_NAME% ^
   --capacity=%CAPACITY% ^
-  --docker-cpus=%CAPACITY% ^
   --prune-threshold=10 ^
-  --allow-push=ocurrent/opam-staging ^
   --connect=%SECRETS%\pool-windows-x86_64.cap ^
-  --verbosity=info
+  --obuilder-docker-backend=%LIB%\obuilder ^
+  --docker-cpus=%CAPACITY% ^
+  --docker-memory=12g ^
+  --verbose
 
 @rem as an Administrator
-sc start ocluster-worker
+sc start %WORKER_NAME%
 
-@rem Convert user.cap from CRLF to LF
-.\output\ocluster-admin.exe add-client ^
+@rem Create an account on the scheduler
+@ren Convert user.cap from CRLF to LF and to UTF-8?
+.\install\bin\ocluster-admin.exe add-client ^
   --connect=%SECRETS%\admin.cap user > %SECRETS%\user.cap
+
+@rem Register the DLL with Event Logging
+set REG_DLL_PATH=%CD%\install\lib\ocluster\dllprovider.dll
+set REG_PATH=HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\EventLog\Application
+set REG_SCHEDULER_PATH=%REG_PATH%\%SCHEDULER_NAME%
+set REG_WORKER_PATH=%REG_PATH%\%WORKER_NAME%
+
+reg ADD "%REG_WORKER_PATH%" /v CategoryCount        /t REG_DWORD /d 0x00000001
+reg ADD "%REG_WORKER_PATH%" /v CategoryMessageFile  /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_WORKER_PATH%" /v EventMessageFile     /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_WORKER_PATH%" /v ParameterMessageFile /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_WORKER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x00000007
+
+reg ADD "%REG_SCHEDULER_PATH%" /v CategoryCount        /t REG_DWORD /d 0x00000001
+reg ADD "%REG_SCHEDULER_PATH%" /v CategoryMessageFile  /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_SCHEDULER_PATH%" /v EventMessageFile     /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_SCHEDULER_PATH%" /v ParameterMessageFile /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_SCHEDULER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x00000007
 ```
 
 [ocluster]: https://github.com/ocurrent/ocluster/
