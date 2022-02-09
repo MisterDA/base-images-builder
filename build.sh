@@ -36,14 +36,15 @@ case $1 in
         ocaml-env exec -- dune build @install --profile=$PROFILE --root=.
         ocaml-env exec -- dune install --prefix=install --relocatable --root=.
 
-        OUTPUT=ocluster/install/bin
-        for dir in ocluster/install/bin; do
+        OUTPUT=/home/opam/base-images-builder/output
+        for dir in ~/ocluster/install/bin; do
             for exe in "$dir"/*.exe ; do
                 for dll in $(PATH="/usr/x86_64-w64-mingw32/sys-root/mingw/bin:$PATH" cygcheck "$exe" | grep -F x86_64-w64-mingw32 | sed -e 's/^ *//'); do
                     if [ ! -e "$OUTPUT/$(basename "$dll")" ] ; then
                         cp "$dll" "$OUTPUT/"
                     fi
                 done
+                cp "$exe" "$OUTPUT/"
             done
         done
         ;;
