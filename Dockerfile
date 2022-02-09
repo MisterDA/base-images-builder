@@ -1,5 +1,5 @@
 # escape=`
-FROM ocaml/opam:windows-mingw
+FROM ocaml/opam:windows-mingw-ocaml-4.13
 ARG OPAMJOBS
 ADD https://capnproto.org/capnproto-c++-win32-0.9.1.zip capnproto-c++-win32-0.9.1.zip
 RUN C:\cygwin64\bin\bash.exe --login -c "unzip capnproto-c++-win32-0.9.1.zip && mv capnproto-tools-win32-0.9.1/* /usr/bin"
