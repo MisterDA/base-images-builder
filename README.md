@@ -36,6 +36,8 @@ set ALLOW_PUSH=ocurrent/opam-staging
 
 @rem Set the Docker isolation
 set ISOLATION=hyperv
+@rem Set the Docker network
+set NETWORK=nat
 
 @rem Build everything
 .\deps.cmd && .\build.cmd
