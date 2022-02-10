@@ -28,6 +28,10 @@ cd base-images-builder
 @rem the OCluster state
 set LIB=C:\Windows\System32\config\systemprofile\AppData\Roaming
 
+@rem Register the DLL with Windows Event Log
+set REG_DLL_PATH=%CD%\install\lib\ocluster\dllprovider.dll
+set REG_PATH=HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\EventLog\Application
+
 @rem the secrets directory
 set SECRETS=%CD%\capnp-secrets
 
@@ -44,8 +48,8 @@ set NETWORK=nat
 
 mkdir %SECRETS%
 
+
 set SCHEDULER_NAME=ocluster-scheduler
-set WORKER_NAME=ocluster-%COMPUTER_NAME%-worker
 
 .\output\ocluster-scheduler.exe install ^
   --state-dir=%LIB%\ocluster-scheduler ^
@@ -56,8 +60,15 @@ set WORKER_NAME=ocluster-%COMPUTER_NAME%-worker
   --pools=windows-x86_64 ^
   --verbosity=info
 
-@rem as an Administrator
-sc start %SCHEDULER_NAME%
+set REG_SCHEDULER_PATH=%REG_PATH%\%SCHEDULER_NAME%
+reg ADD "%REG_SCHEDULER_PATH%" /v CategoryCount        /t REG_DWORD /d 0x00000001
+reg ADD "%REG_SCHEDULER_PATH%" /v CategoryMessageFile  /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_SCHEDULER_PATH%" /v EventMessageFile     /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_SCHEDULER_PATH%" /v ParameterMessageFile /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_SCHEDULER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x00000007
+
+
+set WORKER_NAME=ocluster-%COMPUTERNAME%-worker
 
 set /a CAPACITY=NUMBER_OF_PROCESSORS/4
 
@@ -72,6 +83,16 @@ set /a CAPACITY=NUMBER_OF_PROCESSORS/4
   --docker-memory=12g ^
   --verbose
 
+set REG_WORKER_PATH=%REG_PATH%\%WORKER_NAME%
+reg ADD "%REG_WORKER_PATH%" /v CategoryCount        /t REG_DWORD /d 0x00000001
+reg ADD "%REG_WORKER_PATH%" /v CategoryMessageFile  /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_WORKER_PATH%" /v EventMessageFile     /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_WORKER_PATH%" /v ParameterMessageFile /t REG_SZ    /d "%REG_DLL_PATH%"
+reg ADD "%REG_WORKER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x00000007
+
+@rem as an Administrator
+sc start %SCHEDULER_NAME%
+
 @rem as an Administrator
 sc start %WORKER_NAME%
 
@@ -80,23 +101,20 @@ sc start %WORKER_NAME%
 .\output\ocluster-admin.exe add-client ^
   --connect=%SECRETS%\admin.cap user > %SECRETS%\user.cap
 
-@rem Register the DLL with Event Logging
-set REG_DLL_PATH=%CD%\install\lib\ocluster\dllprovider.dll
-set REG_PATH=HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\EventLog\Application
-set REG_SCHEDULER_PATH=%REG_PATH%\%SCHEDULER_NAME%
-set REG_WORKER_PATH=%REG_PATH%\%WORKER_NAME%
 
-reg ADD "%REG_WORKER_PATH%" /v CategoryCount        /t REG_DWORD /d 0x00000001
-reg ADD "%REG_WORKER_PATH%" /v CategoryMessageFile  /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_WORKER_PATH%" /v EventMessageFile     /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_WORKER_PATH%" /v ParameterMessageFile /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_WORKER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x00000007
+reg delete "%REG_SCHEDULER_PATH%" /v CategoryCount /f
+reg delete "%REG_SCHEDULER_PATH%" /v CategoryMessageFile /f
+reg delete "%REG_SCHEDULER_PATH%" /v EventMessageFile /f
+reg delete "%REG_SCHEDULER_PATH%" /v ParameterMessageFile /f
+reg delete "%REG_SCHEDULER_PATH%" /v TypesSupported /f
+reg delete "%REG_WORKER_PATH%" /v CategoryCount /f
+reg delete "%REG_WORKER_PATH%" /v CategoryMessageFile /f
+reg delete "%REG_WORKER_PATH%" /v EventMessageFile /f
+reg delete "%REG_WORKER_PATH%" /v ParameterMessageFile /f
+reg delete "%REG_WORKER_PATH%" /v TypesSupported /f
 
-reg ADD "%REG_SCHEDULER_PATH%" /v CategoryCount        /t REG_DWORD /d 0x00000001
-reg ADD "%REG_SCHEDULER_PATH%" /v CategoryMessageFile  /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_SCHEDULER_PATH%" /v EventMessageFile     /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_SCHEDULER_PATH%" /v ParameterMessageFile /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_SCHEDULER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x00000007
+sc delete %SCHEDULER_NAME%
+sc delete %WORKER_NAME%
 ```
 
 [ocluster]: https://github.com/ocurrent/ocluster/
