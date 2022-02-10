@@ -45,7 +45,7 @@ mkdir %SECRETS%
 set SCHEDULER_NAME=ocluster-scheduler
 set WORKER_NAME=ocluster-%COMPUTER_NAME%-worker
 
-.\install\bin\ocluster-scheduler.exe install ^
+.\output\ocluster-scheduler.exe install ^
   --state-dir=%LIB%\ocluster-scheduler ^
   --capnp-secret-key-file=%SECRETS%\key.pem ^
   --capnp-listen-address=tcp:0.0.0.0:9000 ^
@@ -59,7 +59,7 @@ sc start %SCHEDULER_NAME%
 
 set /a CAPACITY=NUMBER_OF_PROCESSORS/4
 
-.\install\bin\ocluster-worker.exe install ^
+.\output\ocluster-worker.exe install ^
   --state-dir=%LIB%\ocluster-worker ^
   --name=%WORKER_NAME% ^
   --capacity=%CAPACITY% ^
@@ -75,7 +75,7 @@ sc start %WORKER_NAME%
 
 @rem Create an account on the scheduler
 @ren Convert user.cap from CRLF to LF and to UTF-8?
-.\install\bin\ocluster-admin.exe add-client ^
+.\output\ocluster-admin.exe add-client ^
   --connect=%SECRETS%\admin.cap user > %SECRETS%\user.cap
 
 @rem Register the DLL with Event Logging
