@@ -2,10 +2,10 @@
 @echo off
 
 if not defined ISOLATION (
-  echo "ISOLATION is not defined"
+  echo ISOLATION is not defined
   goto :EOF )
 if not defined NETWORK (
-  echo "NETWORK is not defined"
+  echo NETWORK is not defined
   goto :EOF )
 
 set /a CPU_COUNT=%NUMBER_OF_PROCESSORS%/2
@@ -17,7 +17,7 @@ docker tag builder-base builder-deps
 
 if not exist "%CD%\..\opam-download-cache" mkdir %CD%\..\opam-download-cache
 
-for /l %%i in (1,1,4) do (
+for /l %%i in (1,1,5) do (
   docker run --isolation=%ISOLATION% --cpu-count=%CPU_COUNT% --memory=8g ^
              --network=%NETWORK% --user=ContainerAdministrator ^
              --name basic-next ^

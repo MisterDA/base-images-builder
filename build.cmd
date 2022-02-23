@@ -2,10 +2,10 @@
 @echo off
 
 if not defined ISOLATION (
-  echo "ISOLATION is not defined"
+  echo ISOLATION is not defined
   goto :EOF )
 if not defined NETWORK (
-  echo "NETWORK is not defined"
+  echo NETWORK is not defined
   goto :EOF )
 
 set /a CPU_COUNT=%NUMBER_OF_PROCESSORS%/2
