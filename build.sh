@@ -8,10 +8,12 @@ case $1 in
         pushd ~/opam-repository || exit
         git pull origin -q opam2
         git reset --hard ae5e6e1e209c73f131e577ffa6ee613e5df43b26
-        ocaml-env exec -- opam update
+        # ocaml-env exec -- opam update
+        rsync -ar --update --exclude='.git' ./ /cygdrive/c/opam/.opam/repo/default
         popd || exit
         ;;
     2)
+        ocaml-env exec -- opam pin -y --no-action lwt.5.5.0 'git+https://github.com/MisterDA/lwt.git#affeedfb5be12789bf3d494835efe3d6b48147da'
         ocaml-env exec -- opam pin --no-action -y tcpip.7.0.1 'git+https://github.com/mirage/mirage-tcpip.git#42bed9fd75a31dbc49ae861b3e738964347a7cc6'
         ocaml-env exec -- opam pin --no-action -y mirage-crypto.0.10.5 'git+https://github.com/MisterDA/mirage-crypto.git#a08015bc333662f753ad89419062b253d63b49fc'
         ocaml-env exec -- opam pin --no-action -y mirage-crypto-ec.0.10.5 'git+https://github.com/MisterDA/mirage-crypto.git#a08015bc333662f753ad89419062b253d63b49fc'
@@ -19,7 +21,7 @@ case $1 in
     3)
         pushd ocluster || exit
         git fetch MisterDA
-        git switch windows-event-log
+        git switch windows
         git submodule update --recursive
         popd || exit
         ;;

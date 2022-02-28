@@ -70,17 +70,15 @@ reg ADD "%REG_SCHEDULER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x0000000
 
 set WORKER_NAME=ocluster-%COMPUTERNAME%-worker
 
-set /a CAPACITY=NUMBER_OF_PROCESSORS/4
-
 .\output\ocluster-worker.exe install ^
   --state-dir=%LIB%\ocluster-worker ^
   --name=%WORKER_NAME% ^
-  --capacity=%CAPACITY% ^
+  --capacity=%NUMBER_OF_PROCESSORS% ^
   --prune-threshold=10 ^
   --connect=%SECRETS%\pool-windows-x86_64.cap ^
   --obuilder-docker-backend=%LIB%\obuilder ^
-  --docker-cpus=%CAPACITY% ^
-  --docker-memory=12g ^
+  --docker-cpus=%NUMBER_OF_PROCESSORS% ^
+  --docker-memory=2g ^
   --verbose
 
 set REG_WORKER_PATH=%REG_PATH%\%WORKER_NAME%
