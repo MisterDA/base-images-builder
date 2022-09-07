@@ -13,3 +13,6 @@ RUN git clone --recursive https://github.com/ocurrent/ocluster.git && `
     git remote add MisterDA https://github.com/MisterDA/obuilder.git && `
     git fetch MisterDA
 RUN opam config set-global jobs %OPAMJOBS%
+RUN git config --global --add safe.directory /home/opam/opam-repository && `
+    git config --global --add safe.directory /home/opam/ocluster && `
+    git config --global --add safe.directory /home/opam/ocluster/obuilder
