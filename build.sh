@@ -8,6 +8,7 @@ case $1 in
         pushd ~/opam-repository || exit
         git fetch origin -q opam2
         git reset --hard 685666e522ae6d8e09e51b760996bf6ea5f1668a
+        rsync -ar --update --exclude='.git' ./ /cygdrive/c/opam/.opam/repo/default
         ocaml-env exec -- opam update
         popd || exit
         ;;
