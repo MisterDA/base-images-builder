@@ -28,10 +28,6 @@ cd base-images-builder
 @rem the OCluster state
 set LIB=C:\Windows\System32\config\systemprofile\AppData\Roaming
 
-@rem Register the DLL with Windows Event Log
-set REG_DLL_PATH=%CD%\install\lib\ocluster\dllprovider.dll
-set REG_PATH=HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\EventLog\Application
-
 @rem the secrets directory
 set SECRETS=%CD%\capnp-secrets
 
@@ -51,7 +47,7 @@ mkdir %SECRETS%
 
 set SCHEDULER_NAME=ocluster-scheduler
 
-.\output\ocluster-scheduler.exe install ^
+.\output\ocluster-scheduler.exe ^
   --state-dir=%LIB%\ocluster-scheduler ^
   --capnp-secret-key-file=%SECRETS%\key.pem ^
   --capnp-listen-address=tcp:0.0.0.0:9000 ^
@@ -60,19 +56,11 @@ set SCHEDULER_NAME=ocluster-scheduler
   --pools=windows-x86_64 ^
   --verbosity=info
 
-set REG_SCHEDULER_PATH=%REG_PATH%\%SCHEDULER_NAME%
-reg ADD "%REG_SCHEDULER_PATH%" /v CategoryCount        /t REG_DWORD /d 0x00000001
-reg ADD "%REG_SCHEDULER_PATH%" /v CategoryMessageFile  /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_SCHEDULER_PATH%" /v EventMessageFile     /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_SCHEDULER_PATH%" /v ParameterMessageFile /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_SCHEDULER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x00000007
-
-
-set WORKER_NAME=ocluster-%COMPUTERNAME%-worker
+set WORKER_NAME=ocluster-worker
 
 set /a CAPACITY=NUMBER_OF_PROCESSORS/4
 
-.\output\ocluster-worker.exe install ^
+.\output\ocluster-worker.exe ^
   --state-dir=%LIB%\ocluster-worker ^
   --name=%WORKER_NAME% ^
   --capacity=%CAPACITY% ^
@@ -82,13 +70,6 @@ set /a CAPACITY=NUMBER_OF_PROCESSORS/4
   --docker-cpus=%CAPACITY% ^
   --docker-memory=12g ^
   --verbose
-
-set REG_WORKER_PATH=%REG_PATH%\%WORKER_NAME%
-reg ADD "%REG_WORKER_PATH%" /v CategoryCount        /t REG_DWORD /d 0x00000001
-reg ADD "%REG_WORKER_PATH%" /v CategoryMessageFile  /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_WORKER_PATH%" /v EventMessageFile     /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_WORKER_PATH%" /v ParameterMessageFile /t REG_SZ    /d "%REG_DLL_PATH%"
-reg ADD "%REG_WORKER_PATH%" /v TypesSupported       /t REG_DWORD /d 0x00000007
 
 @rem as an Administrator
 sc start %SCHEDULER_NAME%
@@ -101,18 +82,7 @@ sc start %WORKER_NAME%
 .\output\ocluster-admin.exe add-client ^
   --connect=%SECRETS%\admin.cap user > %SECRETS%\user.cap
 
-
-reg delete "%REG_SCHEDULER_PATH%" /v CategoryCount /f
-reg delete "%REG_SCHEDULER_PATH%" /v CategoryMessageFile /f
-reg delete "%REG_SCHEDULER_PATH%" /v EventMessageFile /f
-reg delete "%REG_SCHEDULER_PATH%" /v ParameterMessageFile /f
-reg delete "%REG_SCHEDULER_PATH%" /v TypesSupported /f
-reg delete "%REG_WORKER_PATH%" /v CategoryCount /f
-reg delete "%REG_WORKER_PATH%" /v CategoryMessageFile /f
-reg delete "%REG_WORKER_PATH%" /v EventMessageFile /f
-reg delete "%REG_WORKER_PATH%" /v ParameterMessageFile /f
-reg delete "%REG_WORKER_PATH%" /v TypesSupported /f
-
+@rem To remove the services:
 sc delete %SCHEDULER_NAME%
 sc delete %WORKER_NAME%
 ```
