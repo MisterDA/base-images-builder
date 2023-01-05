@@ -20,8 +20,8 @@ case $1 in
         ;;
     3)
         pushd ocluster || exit
-        git fetch ocurrent
-        git switch master
+        git fetch MisterDA
+        git switch obuilder-docker-backend
         git submodule update --recursive
         popd || exit
         ;;
