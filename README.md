@@ -44,6 +44,7 @@ set NETWORK=nat
 
 mkdir %SECRETS%
 
+set HOSTNAME=win2022-08.ad.ocamllabs.io
 
 set SCHEDULER_NAME=ocluster-scheduler
 
@@ -51,7 +52,7 @@ set SCHEDULER_NAME=ocluster-scheduler
   --state-dir=%LIB%\ocluster-scheduler ^
   --capnp-secret-key-file=%SECRETS%\key.pem ^
   --capnp-listen-address=tcp:0.0.0.0:9000 ^
-  --capnp-public-address=tcp:localhost:9000 ^
+  --capnp-public-address=tcp:%HOSTNAME%:9000 ^
   --secrets-dir=%SECRETS% ^
   --pools=windows-x86_64 ^
   --verbosity=info
