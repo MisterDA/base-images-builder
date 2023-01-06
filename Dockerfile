@@ -1,7 +1,7 @@
 # escape=`
 FROM ocaml/opam:windows-mingw-ocaml-4.14
 ARG OPAMJOBS
-ENV CAPNP_VERSION=0.10.2
+ENV CAPNP_VERSION=0.10.3
 ADD https://capnproto.org/capnproto-c++-win32-$CAPNP_VERSION.zip capnproto-c++-win32-$CAPNP_VERSION.zip
 RUN C:\cygwin64\bin\bash.exe --login -c "unzip -j capnproto-c++-win32-$CAPNP_VERSION.zip capnproto-tools-win32-$CAPNP_VERSION/capnp.exe -d /usr/bin"
 RUN ocaml-env exec -- opam depext -yi conf-gmp conf-graphviz conf-sqlite3 conf-libffi
