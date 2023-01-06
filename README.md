@@ -55,7 +55,7 @@ set SCHEDULER_NAME=ocluster-scheduler
   --capnp-public-address=tcp:%HOSTNAME%:9000 ^
   --secrets-dir=%SECRETS% ^
   --pools=windows-x86_64 ^
-  --verbosity=info
+  --verbose
 
 set WORKER_NAME=ocluster-worker
 
@@ -67,7 +67,7 @@ set /a CAPACITY=NUMBER_OF_PROCESSORS/4
   --capacity=%CAPACITY% ^
   --prune-threshold=10 ^
   --connect=%SECRETS%\pool-windows-x86_64.cap ^
-  --obuilder-docker-backend=%LIB%\obuilder ^
+  --obuilder-store=docker:%LIB%\obuilder ^
   --docker-cpus=%CAPACITY% ^
   --docker-memory=12g ^
   --verbose

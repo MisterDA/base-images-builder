@@ -5,12 +5,13 @@ shopt -s nullglob
 
 case $1 in
     1)
-        pushd ~/opam-repository || exit
-        git fetch origin -q opam2
-        git reset --hard 696c4b27488b4b0d3ec3929dbe65565cb91764a1
-        rsync -ar --update --exclude='.git' ./ /cygdrive/c/opam/.opam/repo/default
-        ocaml-env exec -- opam update
-        popd || exit
+        :
+        # pushd ~/opam-repository || exit
+        # git fetch origin -q opam2
+        # git reset --hard 696c4b27488b4b0d3ec3929dbe65565cb91764a1
+        # rsync -ar --update --exclude='.git' ./ /cygdrive/c/opam/.opam/repo/default
+        # ocaml-env exec -- opam update
+        # popd || exit
         ;;
     2)
         :
@@ -20,8 +21,8 @@ case $1 in
         ;;
     3)
         pushd ocluster || exit
-        git fetch MisterDA
-        git switch obuilder-docker-backend
+        git fetch -q MisterDA
+        git reset --hard obuilder-docker-backend
         git submodule update --recursive
         popd || exit
         ;;
