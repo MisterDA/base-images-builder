@@ -8,16 +8,14 @@ case $1 in
         :
         # pushd ~/opam-repository || exit
         # git fetch origin -q opam2
-        # git reset --hard 696c4b27488b4b0d3ec3929dbe65565cb91764a1
+        # git reset --hard $OPAM_SHA
         # rsync -ar --update --exclude='.git' ./ /cygdrive/c/opam/.opam/repo/default
         # ocaml-env exec -- opam update
         # popd || exit
         ;;
     2)
         :
-        # ocaml-env exec -- opam pin --no-action -y tcpip.7.0.1 'git+https://github.com/mirage/mirage-tcpip.git#42bed9fd75a31dbc49ae861b3e738964347a7cc6'
-        # ocaml-env exec -- opam pin --no-action -y mirage-crypto.0.10.5 'git+https://github.com/MisterDA/mirage-crypto.git#a08015bc333662f753ad89419062b253d63b49fc'
-        # ocaml-env exec -- opam pin --no-action -y mirage-crypto-ec.0.10.5 'git+https://github.com/MisterDA/mirage-crypto.git#a08015bc333662f753ad89419062b253d63b49fc'
+        ocaml-env exec -- opam pin -yn sha.1.15.4 https://github.com/djs55/ocaml-sha/releases/download/v1.15.4/sha-1.15.4.tbz
         ;;
     3)
         pushd ocluster || exit
