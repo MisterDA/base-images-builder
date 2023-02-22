@@ -20,7 +20,7 @@ case $1 in
     3)
         pushd ocluster || exit
         git fetch -q MisterDA
-        git reset --hard obuilder-docker-backend
+        git reset --hard MisterDA/obuilder-docker-backend
         git submodule update --recursive
         popd || exit
         ;;
