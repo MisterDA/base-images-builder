@@ -1,5 +1,5 @@
 # escape=`
-FROM ocaml/opam:windows-mingw-ocaml-4.14
+FROM ocaml/opam:windows-mingw-ltsc2022-ocaml-4.14
 ARG OPAMJOBS
 ENV CAPNP_VERSION=0.10.4
 ADD https://capnproto.org/capnproto-c++-win32-$CAPNP_VERSION.zip capnproto-c++-win32-$CAPNP_VERSION.zip
