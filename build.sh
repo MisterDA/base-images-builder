@@ -15,12 +15,9 @@ case $1 in
         ;;
     2)
         :
-        ocaml-env exec -- opam pin -yn sha.1.15.4 https://github.com/djs55/ocaml-sha/releases/download/v1.15.4/sha-1.15.4.tbz
         ;;
     3)
         pushd ocluster || exit
-        git fetch -q MisterDA
-        git reset --hard MisterDA/obuilder-docker-backend
         git submodule update --recursive
         popd || exit
         ;;
